@@ -5,6 +5,7 @@ namespace DSL.Example
         public static void Main(string[] args)
         {
             //TuiApp.Example1.Start();
+            Example2.Start();
         }
     }
 }
