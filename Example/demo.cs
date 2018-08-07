@@ -1,6 +1,7 @@
 using Terminal.Gui;
 using System;
 using Mono.Terminal;
+using System.IO;
 
 static class Demo {
 	class Box10x : View {
@@ -113,8 +114,10 @@ static class Demo {
 			Width = Dim.Width (loginText)
 		};
 
+	CheckBox errorCheckbox;
+
 		// Add some content
-		container.Add (
+	container.Add (
 			login,
 			loginText,
 			password,
@@ -136,11 +139,26 @@ static class Demo {
 			//scrollView2,
 			new Button (3, 19, "Ok"),
 			new Button (10, 19, "Cancel"),
+			errorCheckbox = new CheckBox(25, 21, "As Error"),
+			new Button(40, 21, "Show Message") { Clicked = () => {
+			    if (errorCheckbox.Checked)
+				MessageBox.ErrorQuery(50, 10, "The Title", "The Message!", "B1", "B2", "B3");
+			    else
+				MessageBox.Query(50, 10, "The Title", "The Message!", "B1", "B2", "B3"); }
+			},
+			new Button(40, 20, "Open Hex") { Clicked = OpenHexFile },
 			progress,
-			new Label (3, 22, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar")
+			new Label (3, 23, "Press F9 (on Unix, ESC+9 is an alias) to activate the menubar")
 
 		);
 
+	}
+
+	static void OpenHexFile()
+	{
+	    var od = new OpenDialog("Open HEX File", "Select a file to open in HEX view.");
+	    od.DirectoryPath = "/";
+	    Application.Run (od);
 	}
 
 	public static Label ml2;
@@ -229,7 +247,11 @@ static class Demo {
 		});
 		ntop.Add (menu);
 
-		var win = new Window ("/etc/passwd") {
+		var sampleFile = "/etc/passwd";
+		if (!File.Exists(sampleFile))
+		    sampleFile = "/windows/system32/drivers/etc/hosts";
+
+		var win = new Window (sampleFile) {
 			X = 0,
 			Y = 1,
 			Width = Dim.Fill (),
@@ -237,7 +259,7 @@ static class Demo {
 		};
 		ntop.Add (win);
 
-		var source = System.IO.File.OpenRead ("/etc/passwd");
+		var source = System.IO.File.OpenRead (sampleFile);
 		var hex = new HexView (source) {
 			X = 0,
 			Y = 0,
